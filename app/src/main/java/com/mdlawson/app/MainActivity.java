@@ -1,12 +1,17 @@
 package com.mdlawson.app;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.mdlawson.app.events.ItemsLoaded;
 import com.mdlawson.app.model.Item;
@@ -19,6 +24,7 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.swipe) SwipeRefreshLayout swipe;
     // Item adapter represents our data model
     private ItemAdapter items;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +76,38 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
             case R.id.action_add: {
-                items.create(new Item("New item", "Bleeeh"));
+                //items.create(new Item("New item", "Bleeeh"));
+                createDialog();
             }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void createDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.item_create)
+                .setView(R.layout.create_dialog)
+                .setCancelable(true)
+                .setPositiveButton(R.string.create_action, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        DialogHolder dialog = new DialogHolder(dialogInterface);
+                        items.create(new Item(dialog.title.getText().toString(),
+                                              dialog.body.getText().toString()));
+                    }
+                }).show();
+    }
+
     public void onEvent(ItemsLoaded e) {
         swipe.setRefreshing(false);
+    }
+
+    class DialogHolder {
+        @InjectView(R.id.edit_title) EditText title;
+        @InjectView(R.id.edit_body) EditText body;
+        public DialogHolder(DialogInterface dialogInterface) {
+            ButterKnife.inject(this, (Dialog) dialogInterface);
+        }
     }
 }
