@@ -21,6 +21,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // When activity is created, load the layout
         // Non butterknife/layout reliant things can happen here
+        // if we have event listeners, uncomment:
+        // bus.register(this);
     }
 
     @Override
