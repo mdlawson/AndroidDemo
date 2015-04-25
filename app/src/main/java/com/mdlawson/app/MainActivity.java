@@ -1,11 +1,14 @@
 package com.mdlawson.app;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import butterknife.InjectView;
+import com.mdlawson.app.events.ItemsLoaded;
 import com.mdlawson.app.model.Item;
 
 // Simple activity
@@ -13,6 +16,7 @@ public class MainActivity extends BaseActivity {
 
     // Butterknife injections, automatically grabs view with given id from the the layout and assigns it to property
     @InjectView(R.id.items_list) RecyclerView itemsView;
+    @InjectView(R.id.swipe) SwipeRefreshLayout swipe;
     // Item adapter represents our data model
     private ItemAdapter items;
 
@@ -21,8 +25,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // When activity is created, load the layout
         // Non butterknife/layout reliant things can happen here
-        // if we have event listeners, uncomment:
-        // bus.register(this);
+        bus.register(this); // we must have event listeners (onEvent) defined
     }
 
     @Override
@@ -38,6 +41,14 @@ public class MainActivity extends BaseActivity {
         // Create a new item adapter, represents a data store
         items = new ItemAdapter(this, lm);
         itemsView.setAdapter(items); // bind it to the view
+        itemsView.setItemAnimator(new DefaultItemAnimator());
+
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                items.refresh();
+            }
+        });
     }
 
     @Override
@@ -64,5 +75,9 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onEvent(ItemsLoaded e) {
+        swipe.setRefreshing(false);
     }
 }

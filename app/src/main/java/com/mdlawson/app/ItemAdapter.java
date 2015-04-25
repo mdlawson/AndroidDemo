@@ -12,8 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.mdlawson.app.events.ItemsLoaded;
 import com.mdlawson.app.model.Item;
 import com.orhanobut.logger.Logger;
+import de.greenrobot.event.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
                             items.clear();
                             items.addAll(result);
                             notifyDataSetChanged(); // Tells the recycler view everything changed
+                            EventBus.getDefault().post(new ItemsLoaded());
                             Logger.d("Items Loaded yay");
                         }
 
